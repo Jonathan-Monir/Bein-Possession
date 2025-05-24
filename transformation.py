@@ -78,9 +78,9 @@ class CameraCalibrator:
     
 
     def __init__(self, cfg_path, cfg_line_path, kp_model_path, line_model_path):
-        # Adjust paths for Kaggle environment
-        cfg_path = '/kaggle/working/SoccerPossession/' + cfg_path
-        cfg_line_path = '/kaggle/working/SoccerPossession/' + cfg_line_path
+#         # Adjust paths for Kaggle environment
+        cfg_path = '/kaggle/working/Bein-Possession/' + cfg_path
+        cfg_line_path = '/kaggle/working/Bein-Possession/' + cfg_line_path
         kp_model_path = '/kaggle/input/' + kp_model_path
         line_model_path = '/kaggle/input/' + line_model_path
 
