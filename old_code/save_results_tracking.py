@@ -36,7 +36,6 @@ data_to_save = serialize_results(results_tracking)
 with open("tracking_results.json", "w") as f:
     import json
     json.dump(data_to_save, f, indent=2)
-print("Dumped", len(data_to_save), "entries.")
 
 from norfair import Detection
 import numpy as np

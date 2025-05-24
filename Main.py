@@ -18,7 +18,7 @@ from make_vid import vid
 from cache.load_tracks import load_results_with_files
 from cache.save_tracks import serialize_results_with_files
 warnings.filterwarnings("ignore")
-results_tracking = []
+results = []
 
 kaggle = True
 
@@ -32,22 +32,12 @@ def measure_time(func, *args, process_name="Process"):
     return result
 
 # TRACKING
-results_tracking, motion_estimators, coord_transformations, video = measure_time(process_video, r"resources\yolo8.pt", r"resources\nemo.mp4", 2, 8.0, 9.0, process_name="Tracking")
-
-# data_to_save = serialize_results_with_files(results_tracking)
-# 
-# with open("cache/tracking_results.json", "w") as f:
-#     import json
-#     json.dump(data_to_save, f, indent=2)
-# print("Dumped", len(data_to_save), "entries.")
-
-# results_tracking = load_results_with_files("cache/tracking_results.json")
+results, motion_estimators, coord_transformations, video = measure_time(process_video, r"resources\yolo8.pt", r"resources\nemo.mp4", 2, 8.0, 9.0, process_name="Tracking")
 
 motion_estimators = 1
 
 # CLUSTERING
-# results_with_class_ids, team1_color, team2_color = measure_time(main_multi_frame, results_tracking, process_name="Clustering")
-results_with_class_ids, team1_color, team2_color = measure_time(main_multi_frame, results_tracking, process_name="Clustering")
+results_with_class_ids, team1_color, team2_color = measure_time(main_multi_frame, results, process_name="Clustering")
 # save_team_player_images(results_with_class_ids)
 print(team1_color, team2_color)
 i = 0
@@ -77,6 +67,7 @@ results = measure_time(process_field_transformation, results_with_class_ids, cal
 #         print(f"player: {results_tracking[i][2]}")
 
 
+poss, team_poss_list = measure_time(CalculatePossession, results, process_name="Possession Calculation")
 
 for i, (frame, ball_detections, player_detections) in enumerate(results_with_class_ids):
     player_detections = yolo_to_norfair_detections(player_detections)
@@ -87,14 +78,12 @@ for i, (frame, ball_detections, player_detections) in enumerate(results_with_cla
 
 
 
-poss, team_poss_list = measure_time(CalculatePossession, results, process_name="Possession Calculation")
 
 
 print("Possession Results:", poss)
 
 
 
-# visualize = draw_bounding_boxes_on_frames(results_with_class_ids, team1_color, team2_color, team_poss_list)
 visualize = draw_bounding_boxes_on_frames(results_with_class_ids, team1_color, team2_color, team_poss_list, motion_estimators, coord_transformations, video)
 
 

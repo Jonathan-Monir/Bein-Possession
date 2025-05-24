@@ -180,7 +180,6 @@ def classify_players_by_features(player_features, n_teams=2):
     labels = kmeans.fit_predict(player_features)
     end_time = time.perf_counter()
     clustering_time = end_time - start_time
-    print(f"MiniBatchKMeans 2 took {clustering_time:.4f} seconds")
     return labels
 
 # -------------------------
@@ -269,8 +268,6 @@ def multi_frame_cluster(results, model=None, norfair=False):
                 all_features.append(feat)
                 features_info.append((frame_idx, box))
         else:
-            print(type(frame))
-            print(frame)
             player_colors, _ = extract_player_colors(frame, player_detections, norfair)
             for colors, box in player_colors:
                 feat = np.array(colors).flatten()
@@ -473,8 +470,6 @@ def main_multi_frame(results=None, debug=False):
     base_model = ResNet50(weights='imagenet', include_top=False, pooling='avg')
     model = Model(inputs=base_model.input, outputs=base_model.output)
     end_model = time.perf_counter()
-    if debug:
-        print(f"Model initialization took {end_model - start_model:.4f} seconds")
     
     start_cluster = time.perf_counter()
     # Note: In this example we set model=None so that color features (via extract_dominant_colors) are used.

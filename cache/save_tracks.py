@@ -56,9 +56,6 @@ def serialize_results_with_files(
     with open(json_path, "w") as f:
         json.dump(serializable, f, indent=2)
 
-    print(f"✅ Saved {len(serializable)} entries")
-    print(f"  • Frames → {frames_dir}/")
-    print(f"  • JSON   → {json_path}")
 
 # data_to_save = serialize_results(results_tracking)
 # with open("cache/tracking_results.json", "w") as f:

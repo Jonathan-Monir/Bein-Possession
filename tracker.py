@@ -16,7 +16,46 @@ from tracking.soccer.draw import AbsolutePath
 # from tracking.soccer.pass_event import Pass
 from fill_miss_tracking import fill_results
 import run_utils as ru
+from rich.progress import Progress, BarColumn, TimeRemainingColumn
+import cv2, os, time
+import numpy as np
+from typing import Optional, Union, List
+from rich.progress import ProgressColumn
 
+class SilentVideo(Video):
+    def __init__(self, *args, **kwargs):
+        # pop off any label if you want
+        kwargs.pop("label", None)
+        super().__init__(*args, **kwargs)
+
+        # re-construct the internal Progress instance with disable=True
+        # copying most of Video.__init__’s logic
+        total_frames = int(self.video_capture.get(cv2.CAP_PROP_FRAME_COUNT)) if self.input_path else 0
+        description = os.path.basename(self.input_path) if self.input_path else f"Camera({self.camera})"
+
+        progress_bar_fields: List[Union[str, ProgressColumn]] = [
+            "[progress.description]{task.description}",
+            BarColumn(),
+            "[yellow]{task.fields[process_fps]:.2f}fps[/yellow]",
+        ]
+        if self.input_path is not None:
+            progress_bar_fields.insert(2, "[progress.percentage]{task.percentage:>3.0f}%")
+            progress_bar_fields.insert(3, TimeRemainingColumn())
+
+        # here’s the only change: disable=True
+        self.progress_bar = Progress(
+            *progress_bar_fields,
+            auto_refresh=False,
+            redirect_stdout=False,
+            redirect_stderr=False,
+            disable=True,           # ← turn the bar off
+        )
+        self.task = self.progress_bar.add_task(
+            description,
+            total=total_frames,
+            start=bool(self.input_path),
+            process_fps=0,
+        )
 # Video and model paths
 video_path = "manc.mp4"
 fps = 10  # Target FPS for extraction
@@ -103,10 +142,16 @@ def process_video(yolo_path: str,
     skip_interval = 1 if target_fps == orig_fps else int(round(orig_fps / target_fps))
 
     # Prepare video writer
-    video = Video(input_path=video_path, output_path="new_vid.mp4")
+    video = SilentVideo(input_path=video_path, output_path="new_vid.mp4")
 
     results = []
     frame_idx = 0
+
+    print_pct = 10
+    # Compute total frames in your clipping window
+    total_frames_window = end_frame - start_frame + 1
+    # Next percentage threshold at which to print
+    next_print_pct = print_pct
 
     # Iterate through the video frames
     for i, frame in enumerate(video):
@@ -120,6 +165,16 @@ def process_video(yolo_path: str,
         # Skip frames to match target FPS
         if skip_interval > 1 and (i - start_frame) % skip_interval != 0:
             continue
+
+        # Compute how many frames we’ve processed so far (within window)
+        processed = i - start_frame + 1
+        # Calculate current percentage
+        pct_done = processed / total_frames_window * 100
+
+        # If we’ve crossed the next threshold, print & bump it
+        if pct_done >= next_print_pct:
+            print(f"Processed {int(next_print_pct)} % of video ({processed}/{total_frames_window} frames)")
+            next_print_pct += print_pct
 
         frame_idx += 1
 

@@ -280,7 +280,6 @@ def get_keypoints_from_heatmap_batch_maxpool_l(
 
 def coords_to_dict(coords, threshold=0.05, ground_plane_only=False):
     kp_list = []
-    print(f"number of batches is {coords.size()[0]}")
     for batch in range(coords.size()[0]):
         keypoints = {}
         for count, c in enumerate(range(coords.size(1))):
