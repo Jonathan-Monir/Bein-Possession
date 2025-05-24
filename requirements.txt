@@ -1,0 +1,11 @@
+sympy==1.12
+tensorflow==2.18.0
+tensorflow_intel==2.18.0
+thread==2.0.5
+torch==2.2.2
+torchvision==0.17.2
+tornado==6.4
+tqdm==4.67.1
+ultralytics==8.3.56
+urllib3_secure_extra==0.1.0
+xmlrpclib==1.0.1
