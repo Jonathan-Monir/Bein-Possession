@@ -127,7 +127,6 @@ def process_field_transformation(precomputed_results, calibrator_cfgs):
     P = None
     for idx, (frame, _, _) in enumerate(precomputed_results):
         try:
-            print(f"Attempting calibration on frame {idx}...")
             P_candidate = calibrator.calibrate(frame, cam, kp_threshold, line_threshold)
 
             # Check that P_candidate is valid (3x4, no NaNs)
@@ -136,9 +135,8 @@ def process_field_transformation(precomputed_results, calibrator_cfgs):
                 print(f"Calibration succeeded on frame {idx}.")
                 break
             else:
-                print(f"Invalid P on frame {idx}, trying next.")
+                pass
         except Exception as e:
-            print(f"Calibration error on frame {idx}: {e}, trying next...")
             continue
 
     if P is None:
@@ -189,7 +187,6 @@ def main():
         with open(precomputed_results_path, "r") as f:
             precomputed_results = json.load(f)
     except Exception as e:
-        print("Error loading precomputed results:", e)
         return
 
     # The calibration configuration paths and thresholds.
