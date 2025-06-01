@@ -961,7 +961,11 @@ def get_detections(yolov11_detector, frame: np.ndarray, class_id: int, confidenc
         List of detections for the specified class.
     """
     h, w = frame.shape[:2]
-    imgsz = 800
+#     imgsz = 800
+    if h > w:
+        imgsz = h
+    else:
+        imgsz = w
      
     imgsz = adjust_imgsz(imgsz)  # or imgsz = adjust_imgsz(imgsz)
     results = yolov11_detector.predict(frame, imgsz=imgsz, verbose=False)
